@@ -23,33 +23,33 @@ public class MemberEntity {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "user_id")
-    private String userId;
-
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "email")
+    @Column(name = "user_email")
     private String email;
 
-    @Column(name = "nick_name")
+    @Column(name = "user_pw")
+    private String password;
+
+    @Column(name = "user_nick")
     private String nickName;
 
-    @Column(name = "create_at")
+    @Column(name = "user_create_dtm")
     private String createAt;
 
-    @Column(name = "update_at")
+    @Column(name = "user_update_dtm")
     private String updateAt;
+
+    @Column(name = "user_recovery_email")
+    private String recoveryEmail;
 
     public MemberDto toMemberDto() {
         return MemberDto.builder()
                 .id(id)
-                .userId(userId)
-                .password(password)
                 .email(email)
+                .password(password)
                 .nickName(nickName)
                 .createAt(createAt)
                 .updateAt(updateAt)
+                .updateAt(recoveryEmail)
                 .build();
     }
 }

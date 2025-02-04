@@ -9,7 +9,7 @@ public class SecurityUser extends User {
     private MemberDto memberDto;
 
     public SecurityUser(MemberDto memberDto) {
-        super(memberDto.getId(), memberDto.getPassword(), AuthorityUtils.createAuthorityList(memberDto.getUserId()));
+        super(memberDto.getId(), memberDto.getPassword(), AuthorityUtils.createAuthorityList(memberDto.getEmail()));
         this.memberDto = memberDto;
     }
 

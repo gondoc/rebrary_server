@@ -15,21 +15,21 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MemberDto {
     private String id;
-    private String userId;
-    private String password;
     private String email;
+    private String password;
     private String nickName;
     private String createAt;
     private String updateAt;
+    private String recoveryEmail;
 
     public MemberEntity toMemberEntity() {
         return MemberEntity.builder()
                 .id(UUID.randomUUID().toString())
-                .userId(userId)
-                .password(PasswordUtil.encrypt(password)) // 여기
                 .email(email)
+                .password(PasswordUtil.encrypt(password))
                 .nickName(nickName)
                 .createAt(LocalDateTime.now().format(DateTimeUtil.getDefaultFormatter()))
+                .recoveryEmail(recoveryEmail)
                 .build();
     }
 }

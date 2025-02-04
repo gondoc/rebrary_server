@@ -17,8 +17,8 @@ public class SecurityUserDetailService implements UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<MemberEntity> opDto = memberRepository.findByUserId(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<MemberEntity> opDto = memberRepository.findByEmail(email);
         if (!opDto.isPresent()) {
             throw new UsernameNotFoundException("User not found");
         } else {

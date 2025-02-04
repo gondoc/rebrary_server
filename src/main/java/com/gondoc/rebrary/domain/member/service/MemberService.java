@@ -1,12 +1,17 @@
 package com.gondoc.rebrary.domain.member.service;
 
+import com.gondoc.rebrary.component.util.RandomUtil;
+import com.gondoc.rebrary.component.util.RedisUtils;
+import com.gondoc.rebrary.config.constant.KorAdjective;
 import com.gondoc.rebrary.domain.member.dto.MemberDto;
+import com.gondoc.rebrary.domain.member.dto.VerifyDto;
 import com.gondoc.rebrary.domain.member.entity.MemberEntity;
 import com.gondoc.rebrary.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -15,6 +20,9 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final KorAdjective korAdjective;
+    private final RandomUtil randomUtil;
+    private final RedisUtils redisUtils;
 
     public boolean signUp(MemberDto dto) throws Exception {
         try {
@@ -26,10 +34,10 @@ public class MemberService {
         }
     }
 
-    public boolean idCheck(String id) throws Exception {
+    public boolean idCheck(String email) throws Exception {
         try {
-            Optional<MemberEntity> byUserId = memberRepository.findByUserId(id);
-            if (byUserId.isPresent()) {
+            Optional<MemberEntity> byUserEmail = memberRepository.findByEmail(email);
+            if (byUserEmail.isPresent()) {
                 return false;
             } else {
                 return true;
@@ -39,13 +47,33 @@ public class MemberService {
         }
     }
 
-    public MemberDto getMember(String memberId) throws Exception {
-        Optional<MemberEntity> opEntity = memberRepository.findByUserId(memberId);
+    public MemberDto getMember(String email) throws Exception {
+        Optional<MemberEntity> opEntity = memberRepository.findByEmail(email);
         if (!opEntity.isPresent()) {
-            throw new Exception(String.format("User %s not found", memberId));
+            throw new Exception(String.format("User %s not found", email));
         } else {
             return opEntity.get().toMemberDto();
         }
     }
 
+    public boolean validVerifyCode(VerifyDto verifyDto) {
+        try {
+            Optional<String> opVerifyCode = redisUtils.get(verifyDto.getEmail(), String.class);
+            return opVerifyCode.isPresent() && opVerifyCode.get().equals(verifyDto.getCode());
+//            int randomIntByMax = randomUtil.getRandomIntByMax(10);
+//            log.info("randomIntByMax is {} ", randomIntByMax);
+//            boolean result = randomIntByMax > 5;
+//            log.info("result is {} ", result);
+//            return result;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
+    }
+
+    public String sendRandomNick() {
+        String adjective = korAdjective.findIndex(randomUtil.getRandomIntByMax(korAdjective.getLength()));
+        String randomInt = String.valueOf(randomUtil.getRandomIntValuesByLength(4));
+        return adjective.concat("리브인").concat(randomInt);
+    }
 }
