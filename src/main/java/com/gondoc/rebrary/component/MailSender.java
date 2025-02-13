@@ -21,7 +21,7 @@ public class MailSender {
     private final RedisUtils redisUtils;
     private final RandomUtil randomUtil;
     private final JavaMailSender javaMailSender;
-    private final static long VERIFY_CD_EXPIRE = 5L;
+    private final static long VERIFY_CD_EXPIRE = 1000 * 60 * 5; // 5분 설정
 
     // 이메일 인증코드 발송
     public boolean sendVerificationCode(String email) {
@@ -30,22 +30,7 @@ public class MailSender {
             MimeMessage message = javaMailSender.createMimeMessage();
             message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(email));
             message.setSubject("re;brary 이메일 인증코드 발송");
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("<table style='width:100%;max-width:500px;margin:0 auto;'>");
-            sb.append("<tr>");
-            sb.append("<td style='text-align:center;padding:20px;font-size: 19px;'>");
-            sb.append("아래의 인증코드를 화면에 입력해주세요!");
-            sb.append("</td>");
-            sb.append("</tr>");
-            sb.append("<tr>");
-            sb.append("<td style='background-color:#deaa79;border-radius:3px;color:#ffffff;font-size:46px;letter-spacing:17px;text-align:center;padding:15px;'>");
-            sb.append(verifyCd);
-            sb.append("</td>");
-            sb.append("</tr>");
-            sb.append("</table>");
-
-            message.setContent(sb.toString(), "text/html;charset=UTF-8");
+            message.setContent(getVerifyMailContent(verifyCd), "text/html;charset=UTF-8");
             javaMailSender.send(message);
 
             return true;
@@ -53,6 +38,23 @@ public class MailSender {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
+    }
+
+    private static String getVerifyMailContent(String verifyCd) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<table style='width:100%;max-width:500px;margin:0 auto;'>");
+        sb.append("<tr>");
+        sb.append("<td style='text-align:center;padding:20px;font-size: 19px;'>");
+        sb.append("아래의 인증코드를 화면에 입력해주세요!");
+        sb.append("</td>");
+        sb.append("</tr>");
+        sb.append("<tr>");
+        sb.append("<td style='background-color:#deaa79;border-radius:3px;color:#ffffff;font-size:46px;letter-spacing:17px;text-align:center;padding:15px;'>");
+        sb.append(verifyCd);
+        sb.append("</td>");
+        sb.append("</tr>");
+        sb.append("</table>");
+        return sb.toString();
     }
 
     // 인증 코드 발행

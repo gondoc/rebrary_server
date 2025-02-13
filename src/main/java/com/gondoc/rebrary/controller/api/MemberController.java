@@ -35,10 +35,19 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/check/{id}")
+    @GetMapping("/checkId/{id}")
     public Response<?> idCheck(@PathVariable String id) {
         try {
             return Response.ok(memberService.idCheck(id));
+        } catch (Exception e) {
+            return Response.fail(e.getMessage());
+        }
+    }
+
+    @GetMapping("/checkNick/{nick}")
+    public Response<?> nickCheck(@PathVariable String nick) {
+        try {
+            return Response.ok(memberService.nickCheck(nick));
         } catch (Exception e) {
             return Response.fail(e.getMessage());
         }

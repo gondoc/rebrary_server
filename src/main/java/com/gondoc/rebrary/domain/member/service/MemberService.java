@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -37,11 +36,16 @@ public class MemberService {
     public boolean idCheck(String email) throws Exception {
         try {
             Optional<MemberEntity> byUserEmail = memberRepository.findByEmail(email);
-            if (byUserEmail.isPresent()) {
-                return false;
-            } else {
-                return true;
-            }
+            return byUserEmail.isPresent();
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public boolean nickCheck(String nick) throws Exception {
+        try {
+            Optional<MemberEntity> byUserNick = memberRepository.findByNickName(nick);
+            return byUserNick.isPresent();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -59,7 +63,14 @@ public class MemberService {
     public boolean validVerifyCode(VerifyDto verifyDto) {
         try {
             Optional<String> opVerifyCode = redisUtils.get(verifyDto.getEmail(), String.class);
-            return opVerifyCode.isPresent() && opVerifyCode.get().equals(verifyDto.getCode());
+            if (opVerifyCode.isPresent()) {
+                boolean isEqual = opVerifyCode.get().equals(verifyDto.getCode());
+                return isEqual;
+            } else {
+                return false;
+            }
+//            return opVerifyCode.isPresent() && opVerifyCode.get().equals(verifyDto.getCode());
+
 //            int randomIntByMax = randomUtil.getRandomIntByMax(10);
 //            log.info("randomIntByMax is {} ", randomIntByMax);
 //            boolean result = randomIntByMax > 5;
