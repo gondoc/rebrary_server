@@ -21,8 +21,8 @@ public class RedisUtils {
     }
 
     // key-value 저장 + 만료시간 포함
-    public void set(String key, Object value, long timeout) {
-        redisTemplate.opsForValue().set(key, value, Duration.ofMinutes(timeout));
+    public void set(String key, Object value, Duration duration) {
+        redisTemplate.opsForValue().set(key, value, duration);
     }
 
     // key 로 value 조회

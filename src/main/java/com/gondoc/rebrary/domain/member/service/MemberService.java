@@ -1,5 +1,6 @@
 package com.gondoc.rebrary.domain.member.service;
 
+import com.gondoc.rebrary.component.MailSender;
 import com.gondoc.rebrary.component.util.RandomUtil;
 import com.gondoc.rebrary.component.util.RedisUtils;
 import com.gondoc.rebrary.config.constant.KorAdjective;
@@ -22,6 +23,7 @@ public class MemberService {
     private final KorAdjective korAdjective;
     private final RandomUtil randomUtil;
     private final RedisUtils redisUtils;
+    private final MailSender sender;
 
     public boolean signUp(MemberDto dto) throws Exception {
         try {
@@ -36,7 +38,7 @@ public class MemberService {
     public boolean idCheck(String email) throws Exception {
         try {
             Optional<MemberEntity> byUserEmail = memberRepository.findByEmail(email);
-            return byUserEmail.isPresent();
+            return !byUserEmail.isPresent();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -45,7 +47,7 @@ public class MemberService {
     public boolean nickCheck(String nick) throws Exception {
         try {
             Optional<MemberEntity> byUserNick = memberRepository.findByNickName(nick);
-            return byUserNick.isPresent();
+            return !byUserNick.isPresent();
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
@@ -63,19 +65,7 @@ public class MemberService {
     public boolean validVerifyCode(VerifyDto verifyDto) {
         try {
             Optional<String> opVerifyCode = redisUtils.get(verifyDto.getEmail(), String.class);
-            if (opVerifyCode.isPresent()) {
-                boolean isEqual = opVerifyCode.get().equals(verifyDto.getCode());
-                return isEqual;
-            } else {
-                return false;
-            }
-//            return opVerifyCode.isPresent() && opVerifyCode.get().equals(verifyDto.getCode());
-
-//            int randomIntByMax = randomUtil.getRandomIntByMax(10);
-//            log.info("randomIntByMax is {} ", randomIntByMax);
-//            boolean result = randomIntByMax > 5;
-//            log.info("result is {} ", result);
-//            return result;
+            return opVerifyCode.map(cd -> cd.equals(verifyDto.getCode())).orElse(false);
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;
@@ -86,5 +76,9 @@ public class MemberService {
         String adjective = korAdjective.findIndex(randomUtil.getRandomIntByMax(korAdjective.getLength()));
         String randomInt = String.valueOf(randomUtil.getRandomIntValuesByLength(4));
         return adjective.concat("리브인").concat(randomInt);
+    }
+
+    public long sendVerifyCode(String email) {
+        return sender.sendVerificationCode(email);
     }
 }

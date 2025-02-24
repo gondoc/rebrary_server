@@ -22,7 +22,6 @@ import java.util.Map;
 @RestController
 public class MemberController {
 
-    private final MailSender sender;
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -69,16 +68,16 @@ public class MemberController {
     }
 
     @PostMapping("/reqCd")
-    public Response<?> sendVerifyCodeToEmail(@RequestBody Map<String, String> reqMap) {
+    public Response<Long> sendVerifyCodeToEmail(@RequestBody Map<String, String> reqMap) {
         try {
-            return Response.ok(sender.sendVerificationCode(reqMap.get("email")));
+            return Response.ok(memberService.sendVerifyCode(reqMap.get("email")));
         } catch (Exception e) {
             return Response.fail(e.getMessage());
         }
     }
 
     @PostMapping("/verifyCd")
-    public Response<?> validVerifyCode(@RequestBody VerifyDto verifyDto) {
+    public Response<Boolean> validVerifyCode(@RequestBody VerifyDto verifyDto) {
         try {
             return Response.ok(memberService.validVerifyCode(verifyDto));
         } catch (Exception e) {

@@ -19,7 +19,7 @@ public class RandomUtil {
         return random.nextInt(max - 1);
     }
 
-    public int getRandomIntValuesByLength(int length) {
+    public String getRandomIntValuesByLength(int length) {
         if (length <= 0) {
             return getSingleNumber();
         }
@@ -27,10 +27,10 @@ public class RandomUtil {
         for (int i = 0; i < length; i++) {
             result.append(getSingleNumber());
         }
-        return Integer.parseInt(result.toString());
+        return result.toString();
     }
 
-    private int getSingleNumber() {
-        return random.nextInt(10);
+    private String getSingleNumber() {
+        return String.valueOf(random.nextInt(10));
     }
 }
